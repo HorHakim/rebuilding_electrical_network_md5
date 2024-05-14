@@ -43,14 +43,29 @@ class Planification:
 		return sorted_buildings
 
 
-	# def show_exports_for_datavisulation(self, sorted_buildings)
+	def show_exports_for_datavisulation(self, sorted_buildings):
+		sorted_buildings_ids = [building_object.id_building for building_object in sorted_buildings]
+
+		sorted_infras_ids = []
+		for building in sorted_buildings:
+			for infra_object in building.list_infras:
+				if infra_object.infra_id not in sorted_infras_ids:
+					sorted_infras_ids.append(infra_object.infra_id)
+
+		pandas.DataFrame({"building_id": sorted_buildings_ids,\
+						  "index_priority":[index for index in range(len(sorted_buildings))]}).to_excel("./building_priority.xlsx", index=False)
+
+
+		pandas.DataFrame({"infra_id": sorted_infras_ids,\
+						  "index_priority":[index for index in range(len(sorted_infras_ids))]}).to_excel("./infra_priority.xlsx", index=False)
 
 
 if __name__ == "__main__":
 	csv_path = "../data/reseau_en_arbre.csv"
 	planification_object = Planification(csv_path)
+
 	list_building = planification_object.prepare_data()
+	
 	sorted_buildings = planification_object.run_planification_algo(list_building)
-	print(sorted_buildings)
-	print("_"*20)
-	print(sorted_buildings[0])
+
+	planification_object.show_exports_for_datavisulation(sorted_buildings)
